@@ -2,38 +2,47 @@ package slingge.cooleuropeweather;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
-import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
+import java.util.ArrayList;
+import java.util.List;
 
-import okhttp3.Call;
+import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
 
 
 /**
+ *
  * Created by Slingge on 2017/2/22 0022.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck{
+
+    private RecyclerViewAdapter adapter;
+    private List<String> list;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        get();
+        initNavigationView();
     }
 
-    private void get(){
-        OkHttpUtils.post().url("https://api.heweather.com/x3/weather?").addParams("city","北京").addParams("key","a26e3b8650914bc6a429a6e035253cf5").build().execute(new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                Toast.makeText(MainActivity.this,"网络错误",Toast.LENGTH_LONG).show();
-            }
+    private void initNavigationView(){
+        RecyclerView recyclerView= (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        list=new ArrayList<>();
+        adapter=new RecyclerViewAdapter(this,list);
+        adapter.setHolderCilck(this);
+        recyclerView.setAdapter(adapter);
 
-            @Override
-            public void onResponse(String response, int id) {
-                Toast.makeText(MainActivity.this,response,Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
+
+    @Override
+    public void click() {
+
+    }
 }
