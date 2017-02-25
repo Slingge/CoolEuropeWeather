@@ -4,15 +4,32 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/Asuka"
-        android:gravity="center"
-        android:padding="15dp"
-        android:text="地区"
-        android:textColor="@color/colorWhite"
-        android:textSize="17sp" />
+        android:layout_height="48dp"
+        android:background="@color/Asuka">
+
+        <ImageView
+            android:id="@+id/image_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside"
+            android:visibility="invisible"
+            android:src="@mipmap/ic_back" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="中国"
+            android:textColor="@color/colorWhite"
+            android:textSize="17sp" />
+
+    </RelativeLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

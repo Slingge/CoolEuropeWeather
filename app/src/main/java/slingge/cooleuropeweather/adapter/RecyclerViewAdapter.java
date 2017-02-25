@@ -2,6 +2,7 @@ package slingge.cooleuropeweather.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import slingge.cooleuropeweather.R;
+import slingge.cooleuropeweather.util.ToastUtil;
 
 /**
  * Created by Slingge on 2017/2/24 0024.
@@ -46,9 +48,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         ViewHolder viewHolder = (ViewHolder) holder;
         viewHolder.text.setText(list.get(position));
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ToastUtil.showToast(position+"");
                 holderCilck.click(position);
             }
         });
