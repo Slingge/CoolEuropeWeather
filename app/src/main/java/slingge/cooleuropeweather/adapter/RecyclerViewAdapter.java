@@ -21,7 +21,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<String> list;
 
     public interface HolderCilck {
-        void click();
+        void click(int position);
     }
 
     public HolderCilck holderCilck;
@@ -43,20 +43,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         ViewHolder viewHolder = (ViewHolder) holder;
         viewHolder.text.setText(list.get(position));
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holderCilck.click();
+                holderCilck.click(position);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return list.size();
     }
 
 
