@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     image_back.setVisibility(View.VISIBLE);
                     list.clear();
                     city = "";
+                    text.setText(province);
                     list.addAll(AppJsonFileReader.getCityId(province, "", MainActivity.this));
                 }else if (!province.equals("")) {
                     image_back.setVisibility(View.INVISIBLE);
