@@ -10,23 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/ll_main"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Slingge天气"/>
-
-            </LinearLayout>
-
-        </ScrollView>
+        <include layout="@layout/main" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -37,7 +21,7 @@
         android:layout_gravity="start"
         android:background="@color/colorPageBg"
         android:clickable="true"
-        app:headerLayout="@layout/navi_main"
-        android:fitsSystemWindows="true" />
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/navi_main" />
 
 </android.support.v4.widget.DrawerLayout>
