@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
+import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
 import slingge.cooleuropeweather.util.ToastUtil;
+import slingge.cooleuropeweather.util.abLog;
 
 import static slingge.cooleuropeweather.R.id.recyclerView;
 
@@ -34,14 +36,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private String province = "", city = "";
     private ImageView image_back;
     private TextView text;
-
+    private BiYingPicture biYingPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initNavigationView();
-        new Http().get();
+        init();
+    }
+
+    private void init() {
+        final ImageView image_bg = (ImageView) findViewById(R.id.image_bg);
+
+        biYingPicture = new BiYingPicture(this);
+        biYingPicture.getPicture();
+        biYingPicture.setPictureCallBack(new BiYingPicture.PictureCallBack() {
+            @Override
+            public void Picture(String url) {
+                abLog.e("..................",url);
+                ImageLoader.getInstance().displayImage(url, image_bg);
+            }
+        });
     }
 
     private void initNavigationView() {
