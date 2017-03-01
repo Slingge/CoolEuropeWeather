@@ -3,6 +3,7 @@ package slingge.cooleuropeweather;
 import android.app.Application;
 
 import slingge.cooleuropeweather.util.ImageLoaderUtil;
+import slingge.cooleuropeweather.util.abLog;
 
 
 /**
@@ -31,6 +32,7 @@ public class MyApplication extends Application {
         super.onCreate();
         ImageLoaderUtil.configImageLoader(this);
         cloudReaderApplication = this;
+        abLog.E = true;
 //        HttpUtils.getInstance().setContext(getApplicationContext());
     }
 }

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initNavigationView();
+        new Http().get();
     }
 
     private void initNavigationView() {
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     city = "";
                     text.setText(province);
                     list.addAll(AppJsonFileReader.getCityId(province, "", MainActivity.this));
-                }else if (!province.equals("")) {
+                } else if (!province.equals("")) {
                     image_back.setVisibility(View.INVISIBLE);
                     list.clear();
                     text.setText("中国");
