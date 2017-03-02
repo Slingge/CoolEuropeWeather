@@ -1,6 +1,8 @@
 package slingge.cooleuropeweather;
 
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,18 +13,16 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
+import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
 import slingge.cooleuropeweather.util.ToastUtil;
-import slingge.cooleuropeweather.util.abLog;
+import slingge.cooleuropeweather.view.MyListView;
 
-import static slingge.cooleuropeweather.R.id.recyclerView;
 
 
 /**
@@ -33,10 +33,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
 
+    private WeatherHttp weatherHttp;
+
+    private DrawerLayout drawerLayout;
+
     private String province = "", city = "";
     private ImageView image_back;
     private TextView text;
-    private BiYingPicture biYingPicture;
+
+    private TextView tv_title;
+    private TextView tv_temper, tv_weather;//气温，天气
+    private TextView tv_pm25, tv_aqi;//pm2.5指数，AQI指数
+    private MyListView list1, list2;//未来几天天气，生活建议
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +55,36 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     private void init() {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         final ImageView image_bg = (ImageView) findViewById(R.id.image_bg);
 
-        biYingPicture = new BiYingPicture(this);
+        BiYingPicture biYingPicture = new BiYingPicture(this);
         biYingPicture.getPicture();
         biYingPicture.setPictureCallBack(new BiYingPicture.PictureCallBack() {
             @Override
             public void Picture(String url) {
-                abLog.e("..................",url);
                 ImageLoader.getInstance().displayImage(url, image_bg);
             }
         });
+        weatherHttp=new WeatherHttp(this);
+        weatherHttp.weatherHttp("郑州");
+
+        tv_title = (TextView) findViewById(R.id.tv_title);
+        ImageView image_menu = (ImageView) findViewById(R.id.image_menu);
+        image_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            }
+        });
+        tv_temper = (TextView) findViewById(R.id.tv_temper);
+        tv_weather = (TextView) findViewById(R.id.tv_weather);
+        tv_pm25 = (TextView) findViewById(R.id.tv_pm25);
+        tv_aqi = (TextView) findViewById(R.id.tv_aqi);
+        list1 = (MyListView) findViewById(R.id.list1);
+        list2 = (MyListView) findViewById(R.id.list2);
     }
 
     private void initNavigationView() {
@@ -90,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         list.clear();
         list.addAll(AppJsonFileReader.getCityId("", "", MainActivity.this));
-        ToastUtil.showToast(list.size() + "");
         adapter = new RecyclerViewAdapter(this, list);
         adapter.setHolderCilck(this);
         recyclerView.setAdapter(adapter);
@@ -100,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void click(int position) {
         String str = list.get(position);
-        ToastUtil.showToast(str);
         if (province.equals("")) {
             province = str;
             text.setText(province);
@@ -113,6 +138,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             image_back.setVisibility(View.VISIBLE);
             list.clear();
             list.addAll(AppJsonFileReader.getCityId(province, city, MainActivity.this));
+
+        } else {
+            //网络请求天气数据
+            tv_title.setText(str);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
         adapter.notifyDataSetChanged();
     }

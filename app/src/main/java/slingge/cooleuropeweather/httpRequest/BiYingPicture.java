@@ -44,10 +44,7 @@ public class BiYingPicture {
 
             @Override
             public void onResponse(String response, int id) {
-                abLog.e("..................",response);
-                ToastUtil.showToast(response);
                 pictureCallBack.Picture(response);
-
             }
         });
 

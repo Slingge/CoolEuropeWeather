@@ -29,9 +29,10 @@
 
                 <ImageView
                     android:id="@+id/image_menu"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
+                    android:paddingRight="10dp"
                     android:scaleType="centerInside"
                     android:src="@mipmap/ic_menu" />
 
@@ -117,7 +118,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/tv_pm2.5"
+                            android:id="@+id/tv_pm25"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
