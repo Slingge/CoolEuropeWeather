@@ -7,7 +7,7 @@ package slingge.cooleuropeweather.bean.WeatherDataBean;
 
 public class AQIBean {
 
-    public cityBean aqi;
+    public cityBean city;
 
 
     public class cityBean {

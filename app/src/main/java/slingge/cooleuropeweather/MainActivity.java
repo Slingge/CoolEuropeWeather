@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
+import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.WeatherBean;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
@@ -28,7 +32,7 @@ import slingge.cooleuropeweather.view.MyListView;
 /**
  * Created by Slingge on 2017/2/22 0022.
  */
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck,WeatherHttp.WeatherDataBackCall {
 
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         });
         weatherHttp=new WeatherHttp(this);
+        weatherHttp.setWeatherDataBackCall(this);
         weatherHttp.weatherHttp("郑州");
 
         tv_title = (TextView) findViewById(R.id.tv_title);
@@ -138,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             image_back.setVisibility(View.VISIBLE);
             list.clear();
             list.addAll(AppJsonFileReader.getCityId(province, city, MainActivity.this));
-
         } else {
             //网络请求天气数据
             tv_title.setText(str);
@@ -148,4 +152,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
 
+    @Override
+    public void weathData(AQIBean aqiBean, Daily_forecastBean dailyBean, SuggestionBean suggeBean) {
+        tv_pm25.setText(aqiBean.city.pm25);
+        tv_aqi.setText(aqiBean.city.aqi);
+    }
 }

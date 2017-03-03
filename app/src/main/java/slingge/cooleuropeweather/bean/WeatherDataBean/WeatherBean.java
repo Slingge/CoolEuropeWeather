@@ -13,6 +13,11 @@ public class WeatherBean {
     public List<HeWeatherData> HeWeatherList;
 
     public class HeWeatherData{
+        public String status;
+        public AQIBean aqi;
+        public Daily_forecastBean daily_forecast;
+
+
 
     }
 
