@@ -1,6 +1,5 @@
 package slingge.cooleuropeweather.bean.WeatherDataBean;
 
-import java.util.List;
 
 /**
  * 未来几天天气
