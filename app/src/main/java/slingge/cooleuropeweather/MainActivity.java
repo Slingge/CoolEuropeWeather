@@ -18,9 +18,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import slingge.cooleuropeweather.adapter.PredictionAdapter;
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
 import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.WeatherBean;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
@@ -35,8 +38,6 @@ import slingge.cooleuropeweather.view.MyListView;
  */
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck, WeatherHttp.WeatherDataBackCall {
 
-    private ProgressDialog progressDialog;
-
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
 
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private ImageView image_back;
     private TextView text;
 
-    private TextView tv_title;
+    private TextView tv_title, tv_date;//地区，获取天气日期
     private TextView tv_temper, tv_weather;//气温，天气
     private TextView tv_pm25, tv_aqi;//pm2.5指数，AQI指数
     private MyListView list1, list2;//未来几天天气，生活建议
@@ -57,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
-        showProgressDialog();
     }
 
     private void init() {
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         weatherHttp.weatherHttp("郑州");
 
         tv_title = (TextView) findViewById(R.id.tv_title);
+        tv_date = (TextView) findViewById(R.id.tv_date);
         ImageView image_menu = (ImageView) findViewById(R.id.image_menu);
         image_menu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,34 +156,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
 
     @Override
-    public void weathData(AQIBean aqiBean, Daily_forecastBean dailyBean, SuggestionBean suggeBean) {
+    public void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean) {
+        PredictionAdapter predictionAdapter = new PredictionAdapter(this, dailyList);
+        list1.setAdapter(predictionAdapter);
+        tv_weather.setText(nowBean.cond.txt);
+
+        tv_temper.setText(hourlyBean.tmp);
+        tv_date.setText(hourlyBean.date.substring(hourlyBean.date.length() - 5, hourlyBean.date.length()));
+
         tv_pm25.setText(aqiBean.city.pm25);
         tv_aqi.setText(aqiBean.city.aqi);
     }
 
-
-    private void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("加载中...");
-        }
-        progressDialog.show();
-    }
-
-    private void disProgressDialog() {
-        if (progressDialog.isShowing()) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }
 
 }

@@ -44,6 +44,15 @@
                     android:text="地区"
                     android:textColor="@color/colorWhite"
                     android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="17sp" />
             </RelativeLayout>
 
             <TextView
@@ -52,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="15dp"
-                android:text="19C"
                 android:textColor="@color/colorWhite"
                 android:textSize="45sp" />
 
@@ -62,9 +70,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="10dp"
-                android:text="晴"
                 android:textColor="@color/colorWhite"
-                android:textSize="17sp" />
+                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -13,14 +13,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
 import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.WeatherBean;
 import slingge.cooleuropeweather.util.abLog;
+
+import static android.R.id.list;
 
 /**
  * 获取天气信息
@@ -35,8 +40,9 @@ public class WeatherHttp {
         this.context = context;
     }
 
+    
     public interface WeatherDataBackCall {
-        void weathData(AQIBean aqiBean, Daily_forecastBean dailyBean,SuggestionBean suggeBean);
+        void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean,Hourly_forecastBean hourlyBean);
     }
 
     public WeatherDataBackCall weatherData;
@@ -62,16 +68,24 @@ public class WeatherHttp {
                     JSONArray array = new JSONArray(res);
                     for (int i = 0; i < array.length(); i++) {
                         obj = array.getJSONObject(i);
-                        if(obj.getString("status").equals("ok")){
-                            Gson gson=new Gson();
-                            AQIBean aqiBean=gson.fromJson(obj.getString("aqi"),AQIBean.class);
-                            array=new JSONArray(obj.getString("daily_forecast"));
-                            Daily_forecastBean dailyBean = new Daily_forecastBean();
-                            for(i=0;i<array.length();i++){
-                                dailyBean=gson.fromJson(array.getJSONObject(i).toString(),Daily_forecastBean.class);
+                        if (obj.getString("status").equals("ok")) {
+                            Gson gson = new Gson();
+                            AQIBean aqiBean = gson.fromJson(obj.getString("aqi"), AQIBean.class);
+                            array = new JSONArray(obj.getString("daily_forecast"));
+                            NowBean nowBean = gson.fromJson(obj.getString("now"), NowBean.class);
+                            List<Daily_forecastBean> dailyList = new ArrayList<>();
+                            for (i = 0; i < array.length(); i++) {
+                                Daily_forecastBean dailyBean = gson.fromJson(array.getJSONObject(i).toString(), Daily_forecastBean.class);
+                                dailyList.add(dailyBean);
                             }
-                            SuggestionBean suggeBean =gson.fromJson(obj.getString("suggestion"),SuggestionBean.class);
-                            weatherData.weathData(aqiBean,dailyBean,suggeBean);
+                            JSONArray array1 = new JSONArray(obj.getString("hourly_forecast"));
+                            Hourly_forecastBean hourlyBean = null;
+                            for (i = 0; i < array1.length(); i++) {
+                                hourlyBean = gson.fromJson(array1.getJSONObject(i).toString(), Hourly_forecastBean.class);
+                            }
+
+                            SuggestionBean suggeBean = gson.fromJson(obj.getString("suggestion"), SuggestionBean.class);
+                            weatherData.weathData(aqiBean, dailyList, suggeBean, nowBean,hourlyBean);
                         }
                         abLog.e("天气信息", obj.toString());
                     }
