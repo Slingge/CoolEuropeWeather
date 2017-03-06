@@ -1,16 +1,17 @@
 package slingge.cooleuropeweather;
 
-import android.app.Application;
+
+import org.litepal.LitePalApplication;
 
 import slingge.cooleuropeweather.util.ImageLoaderUtil;
 import slingge.cooleuropeweather.util.abLog;
 
 
 /**
- * Created by jingbin on 2016/11/22.
+ * Created by Slingge on 2016/11/22.
  */
 
-public class MyApplication extends Application {
+public class MyApplication extends LitePalApplication {
 
     private static MyApplication cloudReaderApplication;
 

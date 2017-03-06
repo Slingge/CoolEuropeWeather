@@ -1,5 +1,6 @@
 package slingge.cooleuropeweather;
 
+import android.app.ProgressDialog;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -9,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -28,16 +30,15 @@ import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.view.MyListView;
 
 
-
 /**
  * Created by Slingge on 2017/2/22 0022.
  */
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck,WeatherHttp.WeatherDataBackCall {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.HolderCilck, WeatherHttp.WeatherDataBackCall {
+
+    private ProgressDialog progressDialog;
 
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
-
-    private WeatherHttp weatherHttp;
 
     private DrawerLayout drawerLayout;
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
+        showProgressDialog();
     }
 
     private void init() {
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 ImageLoader.getInstance().displayImage(url, image_bg);
             }
         });
-        weatherHttp=new WeatherHttp(this);
+        WeatherHttp weatherHttp = new WeatherHttp(this);
         weatherHttp.setWeatherDataBackCall(this);
         weatherHttp.weatherHttp("郑州");
 
@@ -157,4 +159,30 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         tv_pm25.setText(aqiBean.city.pm25);
         tv_aqi.setText(aqiBean.city.aqi);
     }
+
+
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("加载中...");
+        }
+        progressDialog.show();
+    }
+
+    private void disProgressDialog() {
+        if (progressDialog.isShowing()) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
 }
