@@ -62,8 +62,8 @@ public class PredictionAdapter extends BaseAdapter {
         Daily_forecastBean bean = list.get(i);
         holder.tv_date.setText(bean.date.replace("-", "."));
         holder.tv_weather.setText(bean.cond.txt_d);
-        holder.tv_min.setText(bean.tmp.min);
-        holder.tv_max.setText(bean.tmp.max);
+        holder.tv_min.setText(bean.tmp.min + "℃");
+        holder.tv_max.setText(bean.tmp.max + "℃");
         return view;
     }
 

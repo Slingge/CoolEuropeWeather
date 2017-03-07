@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorWhite"
+        android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:padding="15dp"
         android:text="地区"

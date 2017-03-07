@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher" />
+         />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,8 +24,9 @@
             android:orientation="vertical">
 
             <RelativeLayout
+                android:id="@+id/rl_title"
                 android:layout_width="match_parent"
-                android:layout_height="48dp">
+                android:layout_height="60dp">
 
                 <ImageView
                     android:id="@+id/image_menu"

@@ -1,6 +1,5 @@
 package slingge.cooleuropeweather;
 
-import android.app.ProgressDialog;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -10,7 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -25,12 +25,13 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.WeatherBean;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
-import slingge.cooleuropeweather.util.ToastUtil;
+import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.view.MyListView;
+
+import static slingge.cooleuropeweather.R.id.rl_title;
 
 
 /**
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
+        StatusBarUtil.setTranslucentForImageView(this, 0, image_back);
     }
 
     private void init() {
@@ -75,6 +77,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         WeatherHttp weatherHttp = new WeatherHttp(this);
         weatherHttp.setWeatherDataBackCall(this);
         weatherHttp.weatherHttp("郑州");
+
+        RelativeLayout rl_title = (RelativeLayout) findViewById(R.id.rl_title);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, StatusBarUtil.getStatusBarHeight(this) + 10, 0, 0);
+        rl_title.setLayoutParams(lp);
 
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_date = (TextView) findViewById(R.id.tv_date);
@@ -99,6 +106,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         text = (TextView) headerView.findViewById(R.id.text);
+        RelativeLayout rl_title2 = (RelativeLayout) headerView.findViewById(R.id.rl_title2);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, StatusBarUtil.getStatusBarHeight(this), 0, 0);
+        rl_title2.setLayoutParams(lp);
         image_back = (ImageView) headerView.findViewById(R.id.image_back);
         image_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         list1.setAdapter(predictionAdapter);
         tv_weather.setText(nowBean.cond.txt);
 
-        tv_temper.setText(hourlyBean.tmp);
+        tv_temper.setText(hourlyBean.tmp + "℃");
         tv_date.setText(hourlyBean.date.substring(hourlyBean.date.length() - 5, hourlyBean.date.length()));
 
         tv_pm25.setText(aqiBean.city.pm25);

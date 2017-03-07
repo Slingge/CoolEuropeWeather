@@ -5,8 +5,9 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/rl_title2"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="60dp"
         android:background="@color/Asuka">
 
         <ImageView
