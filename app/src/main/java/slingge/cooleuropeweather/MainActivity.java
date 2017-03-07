@@ -1,8 +1,10 @@
 package slingge.cooleuropeweather;
 
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,8 +33,6 @@ import slingge.cooleuropeweather.util.AppJsonFileReader;
 import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.view.MyListView;
 
-import static slingge.cooleuropeweather.R.id.rl_title;
-
 
 /**
  * Created by Slingge on 2017/2/22 0022.
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private List<String> list = new ArrayList<>();
 
     private DrawerLayout drawerLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private String province = "", city = "";
     private ImageView image_back;
@@ -59,12 +60,35 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        });
+
         StatusBarUtil.setTranslucentForImageView(this, 0, image_back);
     }
 
     private void init() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         final ImageView image_bg = (ImageView) findViewById(R.id.image_bg);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
+
 
         BiYingPicture biYingPicture = new BiYingPicture(this);
         biYingPicture.getPicture();
@@ -168,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     public void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean) {
+        swipeRefreshLayout.setRefreshing(false);
         PredictionAdapter predictionAdapter = new PredictionAdapter(this, dailyList);
         list1.setAdapter(predictionAdapter);
         tv_weather.setText(nowBean.cond.txt);
