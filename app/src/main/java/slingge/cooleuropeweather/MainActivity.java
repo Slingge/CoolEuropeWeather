@@ -20,6 +20,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import slingge.cooleuropeweather.adapter.LifeAdviceAdapter;
 import slingge.cooleuropeweather.adapter.PredictionAdapter;
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
 import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
 
+    private WeatherHttp weatherHttp;
+
     private DrawerLayout drawerLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -60,15 +63,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
-
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(true);
+                weatherHttp.weatherHttp("郑州");
             }
         });
-
-        StatusBarUtil.setTranslucentForImageView(this, 0, image_back);
+        StatusBarUtil.setTransparentForImageView(this, image_back);
     }
 
     private void init() {
@@ -98,9 +100,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 ImageLoader.getInstance().displayImage(url, image_bg);
             }
         });
-        WeatherHttp weatherHttp = new WeatherHttp(this);
+        weatherHttp = new WeatherHttp(this);
         weatherHttp.setWeatherDataBackCall(this);
-        weatherHttp.weatherHttp("郑州");
 
         RelativeLayout rl_title = (RelativeLayout) findViewById(R.id.rl_title);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -130,10 +131,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         text = (TextView) headerView.findViewById(R.id.text);
-        RelativeLayout rl_title2 = (RelativeLayout) headerView.findViewById(R.id.rl_title2);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, StatusBarUtil.getStatusBarHeight(this), 0, 0);
-        rl_title2.setLayoutParams(lp);
         image_back = (ImageView) headerView.findViewById(R.id.image_back);
         image_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     province = "";
                     list.addAll(AppJsonFileReader.getCityId("", "", MainActivity.this));
                 }
-
                 adapter.notifyDataSetChanged();
+
             }
         });
         RecyclerView recyclerView = (RecyclerView) headerView.findViewById(R.id.recyclerView);
@@ -183,6 +180,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             list.addAll(AppJsonFileReader.getCityId(province, city, MainActivity.this));
         } else {
             //网络请求天气数据
+            swipeRefreshLayout.setRefreshing(true);
+            weatherHttp.weatherHttp(str);
             tv_title.setText(str);
             drawerLayout.closeDrawer(GravityCompat.START);
         }
@@ -191,17 +190,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
 
     @Override
-    public void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean) {
+    public void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean, String upTime) {
         swipeRefreshLayout.setRefreshing(false);
         PredictionAdapter predictionAdapter = new PredictionAdapter(this, dailyList);
         list1.setAdapter(predictionAdapter);
-        tv_weather.setText(nowBean.cond.txt);
 
+        tv_weather.setText(nowBean.cond.txt);
         tv_temper.setText(hourlyBean.tmp + "℃");
-        tv_date.setText(hourlyBean.date.substring(hourlyBean.date.length() - 5, hourlyBean.date.length()));
+        tv_date.setText(upTime.substring(upTime.length() - 5, upTime.length()));
 
         tv_pm25.setText(aqiBean.city.pm25);
         tv_aqi.setText(aqiBean.city.aqi);
+
+        List<String> strList=new ArrayList<>();
+        strList.add(suggeBean.air.txt);
+        strList.add(suggeBean.comf.txt);
+        strList.add(suggeBean.cw.txt);
+        strList.add(suggeBean.drsg.txt);
+        strList.add(suggeBean.flu.txt);
+        strList.add(suggeBean.sport.txt);
+        strList.add(suggeBean.trav.txt);
+        strList.add(suggeBean.uv.txt);
+        LifeAdviceAdapter lifeAdapter = new LifeAdviceAdapter(this, strList);
+        list2.setAdapter(lifeAdapter);
     }
 
 

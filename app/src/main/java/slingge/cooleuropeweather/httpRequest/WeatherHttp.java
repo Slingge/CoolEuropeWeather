@@ -18,6 +18,7 @@ import java.util.List;
 
 import okhttp3.Call;
 import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.BaseicBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
@@ -42,7 +43,7 @@ public class WeatherHttp {
 
     
     public interface WeatherDataBackCall {
-        void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean,Hourly_forecastBean hourlyBean);
+        void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean,Hourly_forecastBean hourlyBean,String upTime);
     }
 
     public WeatherDataBackCall weatherData;
@@ -83,9 +84,9 @@ public class WeatherHttp {
                             for (i = 0; i < array1.length(); i++) {
                                 hourlyBean = gson.fromJson(array1.getJSONObject(i).toString(), Hourly_forecastBean.class);
                             }
-
+                            BaseicBean baseicBean=gson.fromJson(obj.getString("basic"),BaseicBean.class);
                             SuggestionBean suggeBean = gson.fromJson(obj.getString("suggestion"), SuggestionBean.class);
-                            weatherData.weathData(aqiBean, dailyList, suggeBean, nowBean,hourlyBean);
+                            weatherData.weathData(aqiBean, dailyList, suggeBean, nowBean,hourlyBean,baseicBean.update.loc);
                         }
                         abLog.e("天气信息", obj.toString());
                     }
