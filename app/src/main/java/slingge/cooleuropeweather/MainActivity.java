@@ -1,6 +1,10 @@
 package slingge.cooleuropeweather;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -57,6 +61,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private TextView tv_pm25, tv_aqi;//pm2.5指数，AQI指数
     private MyListView list1, list2;//未来几天天气，生活建议
 
+    private LocationService.locationIbinder locationIbinder;
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            locationIbinder = (LocationService.locationIbinder) iBinder;
+            locationIbinder.startLocation();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         });
         StatusBarUtil.setTransparentForImageView(this, image_back);
+        Intent intent = new Intent(MainActivity.this, LocationService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
     }
 
     private void init() {
@@ -202,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         tv_pm25.setText(aqiBean.city.pm25);
         tv_aqi.setText(aqiBean.city.aqi);
 
-        List<String> strList=new ArrayList<>();
+        List<String> strList = new ArrayList<>();
         strList.add(suggeBean.air.txt);
         strList.add(suggeBean.comf.txt);
         strList.add(suggeBean.cw.txt);
