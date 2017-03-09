@@ -46,6 +46,14 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".LocationService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
 
     </application>
 

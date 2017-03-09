@@ -1,19 +1,21 @@
 package slingge.cooleuropeweather;
 
+import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
-import slingge.cooleuropeweather.util.abLog;
 
 /**
+ * 定位
  * Created by Slingge on 2017/3/8 0008.
  */
 
@@ -25,28 +27,19 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-    }
-
-    locationIbinder myBinder = new locationIbinder();
-
-    class locationIbinder extends Binder {
-
-        public void startLocation() {
-            mLocationClient = new LocationClient(getApplicationContext());
-            //声明LocationClient类
-            initLocation();
-            mLocationClient.registerLocationListener(myListener);
-            //注册监听函数
-            mLocationClient.start();
-        }
-
+        mLocationClient = new LocationClient(getApplicationContext());
+        //声明LocationClient类
+        initLocation();
+        mLocationClient.registerLocationListener(myListener);
+        //注册监听函数
+        mLocationClient.start();
     }
 
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return myBinder;
+        return null;
     }
 
 
@@ -54,9 +47,12 @@ public class LocationService extends Service {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            String Country = location.getCountry();
             String city = location.getCity();
-            abLog.e("定位地址", Country + "," + city);
+            Intent intent = new Intent("LocationCity");
+            intent.putExtra("city", city);//要传递的参数
+            sendBroadcast(intent);
+            mLocationClient.stop();
+            mLocationClient = null;
         }
 
         @Override

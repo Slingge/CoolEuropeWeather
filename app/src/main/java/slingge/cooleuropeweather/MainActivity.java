@@ -1,7 +1,10 @@
 package slingge.cooleuropeweather;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,6 +41,9 @@ import slingge.cooleuropeweather.util.AppJsonFileReader;
 import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.view.MyListView;
 
+import static com.baidu.location.a.h.c;
+import static com.baidu.location.d.j.W;
+
 
 /**
  * Created by Slingge on 2017/2/22 0022.
@@ -61,20 +67,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private TextView tv_pm25, tv_aqi;//pm2.5指数，AQI指数
     private MyListView list1, list2;//未来几天天气，生活建议
 
-    private LocationService.locationIbinder locationIbinder;
-
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            locationIbinder = (LocationService.locationIbinder) iBinder;
-            locationIbinder.startLocation();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
+    private String City;
 
 
     @Override
@@ -83,16 +76,24 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
+        StatusBarUtil.setTransparentForImageView(this, image_back);
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(true);
-                weatherHttp.weatherHttp("郑州");
+                Intent intent = new Intent(MainActivity.this, LocationService.class);
+                startService(intent);
             }
         });
-        StatusBarUtil.setTransparentForImageView(this, image_back);
-        Intent intent = new Intent(MainActivity.this, LocationService.class);
-        bindService(intent, connection, BIND_AUTO_CREATE);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("LocationCity");
+        registerReceiver(new MyBroadcastReciver(), filter);
     }
 
     private void init() {
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 new Handler().post(new Runnable() {
                     @Override
                     public void run() {
+                        weatherHttp.weatherHttp(City);
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -147,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         tv_aqi = (TextView) findViewById(R.id.tv_aqi);
         list1 = (MyListView) findViewById(R.id.list1);
         list2 = (MyListView) findViewById(R.id.list2);
+
+
     }
 
     private void initNavigationView() {
@@ -206,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             weatherHttp.weatherHttp(str);
             tv_title.setText(str);
             drawerLayout.closeDrawer(GravityCompat.START);
+            City = str;
         }
         adapter.notifyDataSetChanged();
     }
@@ -237,5 +242,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         list2.setAdapter(lifeAdapter);
     }
 
+
+    private class MyBroadcastReciver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String city = intent.getStringExtra("city");//接收参数
+            String action = intent.getAction();//接收广播识别
+            if (action.equals("LocationCity")) {
+                weatherHttp.weatherHttp(city);
+                tv_title.setText(city);
+            }
+        }
+    }
 
 }
