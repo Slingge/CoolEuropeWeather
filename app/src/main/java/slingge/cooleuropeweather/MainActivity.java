@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -17,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -45,6 +47,8 @@ import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.view.MyListView;
 
+import static slingge.cooleuropeweather.R.id.navi_titleview;
+
 
 /**
  * Created by Slingge on 2017/2/22 0022.
@@ -69,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private MyListView list1, list2;//未来几天天气，生活建议
 
     private String City;
+    private MyBroadcastReciver myBroadcastReciver;
+
+    private RelativeLayout rl_title;
+    private View main_titleview, navi_titleview;
 
 
     @Override
@@ -77,7 +85,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         setContentView(R.layout.activity_main);
         initNavigationView();
         init();
-        StatusBarUtil.setTransparentForImageView(this, image_back);
+        if (Build.VERSION.SDK_INT >= 23) {
+            StatusBarUtil.setTranslucentForImageView(this,0, image_back);
+            main_titleview.setVisibility(View.VISIBLE);
+            navi_titleview.setVisibility(View.VISIBLE);
+        }
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -95,9 +107,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     protected void onStart() {
         super.onStart();
+        myBroadcastReciver = new MyBroadcastReciver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("LocationCity");
-        registerReceiver(new MyBroadcastReciver(), filter);
+        registerReceiver(myBroadcastReciver, filter);
     }
 
     private void init() {
@@ -130,11 +143,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         weatherHttp = new WeatherHttp(this);
         weatherHttp.setWeatherDataBackCall(this);
 
-        RelativeLayout rl_title = (RelativeLayout) findViewById(R.id.rl_title);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, StatusBarUtil.getStatusBarHeight(this) + 10, 0, 0);
-        rl_title.setLayoutParams(lp);
-
+        main_titleview = findViewById(R.id.main_titleview);
+        rl_title = (RelativeLayout) findViewById(R.id.rl_title);
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_date = (TextView) findViewById(R.id.tv_date);
         ImageView image_menu = (ImageView) findViewById(R.id.image_menu);
@@ -159,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private void initNavigationView() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
+        navi_titleview = headerView.findViewById(R.id.navi_titleview);
         text = (TextView) headerView.findViewById(R.id.text);
         image_back = (ImageView) headerView.findViewById(R.id.image_back);
         image_back.setOnClickListener(new View.OnClickListener() {
@@ -285,7 +296,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 PermissionDialog.dialog(this);
             }
         }
+    }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myBroadcastReciver);
+        PermissionDialog.disDialog();
     }
 
 

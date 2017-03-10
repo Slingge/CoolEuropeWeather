@@ -13,8 +13,10 @@ import android.provider.Settings;
 
 public class PermissionDialog {
 
+    public static AlertDialog.Builder dialog;
+
     public static void dialog(final Context context) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog = new AlertDialog.Builder(context);
         dialog.setTitle("需要获取定位权限");
         dialog.setMessage("是否开启？");
         dialog.setPositiveButton("确定",
@@ -35,6 +37,13 @@ public class PermissionDialog {
             }
         });
         dialog.show();
+    }
+
+
+    public static void disDialog() {
+        if (dialog != null) {
+            dialog = null;
+        }
     }
 
 
