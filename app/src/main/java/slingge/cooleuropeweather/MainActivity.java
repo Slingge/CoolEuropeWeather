@@ -27,6 +27,9 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.litepal.crud.DataSupport;
+import org.litepal.tablemanager.Connector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,7 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
+import slingge.cooleuropeweather.db.dbData;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
@@ -83,10 +87,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Connector.getDatabase();
         initNavigationView();
         init();
         if (Build.VERSION.SDK_INT >= 23) {
-            StatusBarUtil.setTranslucentForImageView(this,0, image_back);
+            StatusBarUtil.setTranslucentForImageView(this, 0, image_back);
             main_titleview.setVisibility(View.VISIBLE);
             navi_titleview.setVisibility(View.VISIBLE);
         }
@@ -162,8 +167,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         tv_aqi = (TextView) findViewById(R.id.tv_aqi);
         list1 = (MyListView) findViewById(R.id.list1);
         list2 = (MyListView) findViewById(R.id.list2);
-
-
     }
 
     private void initNavigationView() {
@@ -262,6 +265,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         public void onReceive(Context context, Intent intent) {
             String city = "";
             if (TextUtils.isEmpty(intent.getStringExtra("city"))) {
+                dbData db = DataSupport.findFirst(dbData.class);
+                if (!TextUtils.isEmpty(db.getResponse())) {
+                    weatherHttp.analysisJson(db.getResponse());
+                }
                 ToastUtil.showToast("定位失败，请手动选择所在城市");
                 swipeRefreshLayout.setRefreshing(false);
                 return;
