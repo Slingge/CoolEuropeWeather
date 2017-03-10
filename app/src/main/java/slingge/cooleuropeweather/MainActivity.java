@@ -1,13 +1,12 @@
 package slingge.cooleuropeweather;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,11 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -38,11 +39,11 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
+import slingge.cooleuropeweather.util.Permission;
+import slingge.cooleuropeweather.util.PermissionDialog;
 import slingge.cooleuropeweather.util.StatusBarUtil;
+import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.view.MyListView;
-
-import static com.baidu.location.a.h.c;
-import static com.baidu.location.d.j.W;
 
 
 /**
@@ -81,8 +82,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(true);
-                Intent intent = new Intent(MainActivity.this, LocationService.class);
-                startService(intent);
+                //定位权限判断申请
+                if (Permission.JudgePermission(MainActivity.this)) {
+                    Intent intent = new Intent(MainActivity.this, LocationService.class);
+                    startService(intent);
+                }
             }
         });
 
@@ -114,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 });
             }
         });
-
 
         BiYingPicture biYingPicture = new BiYingPicture(this);
         biYingPicture.getPicture();
@@ -246,7 +249,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private class MyBroadcastReciver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String city = intent.getStringExtra("city");//接收参数
+            String city = "";
+            if (TextUtils.isEmpty(intent.getStringExtra("city"))) {
+                ToastUtil.showToast("定位失败，请手动选择所在城市");
+                swipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+            if (intent.getStringExtra("city").contains("市")) {
+                intent.getStringExtra("city").replace("市", "");
+                city = intent.getStringExtra("city").replace("市", "");//接收参数
+            } else {
+                city = intent.getStringExtra("city");
+            }
             String action = intent.getAction();//接收广播识别
             if (action.equals("LocationCity")) {
                 weatherHttp.weatherHttp(city);
@@ -254,5 +268,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         }
     }
+
+
+    /**
+     * 申请权限结果
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(MainActivity.this, LocationService.class);
+                startService(intent);
+            } else {
+                Toast.makeText(this, "你拒绝了权限申请", Toast.LENGTH_SHORT).show();
+                PermissionDialog.dialog(this);
+            }
+        }
+
+    }
+
 
 }
