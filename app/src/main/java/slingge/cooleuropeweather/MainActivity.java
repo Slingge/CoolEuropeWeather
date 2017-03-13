@@ -18,10 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +48,6 @@ import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.view.MyListView;
 
-import static slingge.cooleuropeweather.R.id.navi_titleview;
 
 
 /**
@@ -79,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private String City;
     private MyBroadcastReciver myBroadcastReciver;
 
-    private RelativeLayout rl_title;
     private View main_titleview, navi_titleview;
 
 
@@ -149,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         weatherHttp.setWeatherDataBackCall(this);
 
         main_titleview = findViewById(R.id.main_titleview);
-        rl_title = (RelativeLayout) findViewById(R.id.rl_title);
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_date = (TextView) findViewById(R.id.tv_date);
         ImageView image_menu = (ImageView) findViewById(R.id.image_menu);
