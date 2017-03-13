@@ -2,12 +2,8 @@ package slingge.cooleuropeweather.httpRequest;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -26,13 +22,9 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.WeatherBean;
-import slingge.cooleuropeweather.db.dbData;
+import slingge.cooleuropeweather.db.dbResponse;
 import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.util.abLog;
-
-import static android.R.id.list;
-import static com.baidu.location.d.j.S;
 
 /**
  * 获取天气信息
@@ -52,7 +44,7 @@ public class WeatherHttp {
         void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean, String upTime);
     }
 
-    public  WeatherDataBackCall weatherData;
+    public WeatherDataBackCall weatherData;
 
     public void setWeatherDataBackCall(WeatherDataBackCall weatherData) {
         this.weatherData = weatherData;
@@ -64,7 +56,7 @@ public class WeatherHttp {
                 build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                dbData db = DataSupport.findFirst(dbData.class);
+                dbResponse db = DataSupport.findFirst(dbResponse.class);
                 if (!TextUtils.isEmpty(db.getResponse())) {
                     analysisJson(db.getResponse());
                     return;
@@ -75,7 +67,7 @@ public class WeatherHttp {
             @Override
             public void onResponse(String response, int id) {
                 analysisJson(response);
-                dbData db = new dbData();//保存
+                dbResponse db = new dbResponse();//保存
                 db.setResponse(response);
                 db.save();
             }

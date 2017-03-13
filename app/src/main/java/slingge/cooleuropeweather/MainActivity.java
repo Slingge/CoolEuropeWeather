@@ -38,7 +38,8 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
-import slingge.cooleuropeweather.db.dbData;
+import slingge.cooleuropeweather.db.dbCity;
+import slingge.cooleuropeweather.db.dbResponse;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
@@ -47,7 +48,6 @@ import slingge.cooleuropeweather.util.PermissionDialog;
 import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.util.ToastUtil;
 import slingge.cooleuropeweather.view.MyListView;
-
 
 
 /**
@@ -96,8 +96,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 swipeRefreshLayout.setRefreshing(true);
                 //定位权限判断申请
                 if (Permission.JudgePermission(MainActivity.this)) {
-                    Intent intent = new Intent(MainActivity.this, LocationService.class);
-                    startService(intent);
+                    dbCity db = DataSupport.findFirst(dbCity.class);
+                    if (!TextUtils.isEmpty(db.getCity())) {
+                        City = db.getCity();
+                        weatherHttp.weatherHttp(City);
+                        tv_title.setText(City);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, LocationService.class);
+                        startService(intent);
+                    }
                 }
             }
         });
@@ -222,6 +229,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             tv_title.setText(str);
             drawerLayout.closeDrawer(GravityCompat.START);
             City = str;
+            dbCity db = new dbCity();
+            db.setCity(City);
+            db.save();
         }
         adapter.notifyDataSetChanged();
     }
@@ -259,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         public void onReceive(Context context, Intent intent) {
             String city = "";
             if (TextUtils.isEmpty(intent.getStringExtra("city"))) {
-                dbData db = DataSupport.findFirst(dbData.class);
+                dbResponse db = DataSupport.findFirst(dbResponse.class);
                 if (!TextUtils.isEmpty(db.getResponse())) {
                     weatherHttp.analysisJson(db.getResponse());
                 }

@@ -1,14 +1,15 @@
 package slingge.cooleuropeweather.httpRequest;
 
 import android.content.Context;
-import android.widget.Toast;
+import android.text.TextUtils;
 
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.litepal.crud.DataSupport;
+
 import okhttp3.Call;
-import slingge.cooleuropeweather.util.ToastUtil;
-import slingge.cooleuropeweather.util.abLog;
+import slingge.cooleuropeweather.db.dbDailyChart;
 
 /**
  * 获取bingying每日一图
@@ -39,12 +40,21 @@ public class BiYingPicture {
         OkHttpUtils.get().url("http://guolin.tech/api/bing_pic").build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                ToastUtil.showToast(e.toString());
+                dbDailyChart db = DataSupport.findFirst(dbDailyChart.class);
+                if(db.isSaved()){
+                    if (TextUtils.isEmpty(db.getDailyChart())) {
+                        return;
+                    }
+                }
+                pictureCallBack.Picture(db.getDailyChart());
             }
 
             @Override
             public void onResponse(String response, int id) {
                 pictureCallBack.Picture(response);
+                dbDailyChart db = new dbDailyChart();
+                db.setDailyChart(response);
+                db.save();
             }
         });
 

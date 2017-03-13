@@ -6,7 +6,9 @@
     <version value="1" />
 
     <list>
-        <mapping class="slingge.cooleuropeweather.db.dbData" />
+        <mapping class="slingge.cooleuropeweather.db.dbCity" />
+        <mapping class="slingge.cooleuropeweather.db.dbDailyChart" />
+        <mapping class="slingge.cooleuropeweather.db.dbResponse" />
     </list>
 
 </litepal>

@@ -10,6 +10,8 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
+import slingge.cooleuropeweather.db.dbCity;
+
 
 /**
  * 定位
@@ -48,6 +50,9 @@ public class LocationService extends Service {
             Intent intent = new Intent("LocationCity");
             intent.putExtra("city", city);//要传递的参数
             sendBroadcast(intent);
+            dbCity db = new dbCity();
+            db.setCity(city);
+            db.save();
             mLocationClient.stop();
             mLocationClient = null;
         }
