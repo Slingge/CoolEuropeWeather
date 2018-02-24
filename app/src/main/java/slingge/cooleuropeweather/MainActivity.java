@@ -34,7 +34,7 @@ import slingge.cooleuropeweather.adapter.LifeAdviceAdapter;
 import slingge.cooleuropeweather.adapter.PredictionAdapter;
 import slingge.cooleuropeweather.adapter.RecyclerViewAdapter;
 import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.HeWeather6Model;
 import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
 import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
@@ -43,7 +43,6 @@ import slingge.cooleuropeweather.db.dbResponse;
 import slingge.cooleuropeweather.httpRequest.BiYingPicture;
 import slingge.cooleuropeweather.httpRequest.WeatherHttp;
 import slingge.cooleuropeweather.util.AppJsonFileReader;
-import slingge.cooleuropeweather.util.Permission;
 import slingge.cooleuropeweather.util.PermissionDialog;
 import slingge.cooleuropeweather.util.StatusBarUtil;
 import slingge.cooleuropeweather.util.ToastUtil;
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private TextView tv_pm25, tv_aqi;//pm2.5指数，AQI指数
     private MyListView list1, list2;//未来几天天气，生活建议
 
-    private String City;
+    private String City;//当前城市
     private MyBroadcastReciver myBroadcastReciver;
 
     private View main_titleview, navi_titleview;
@@ -90,15 +89,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             main_titleview.setVisibility(View.VISIBLE);
             navi_titleview.setVisibility(View.VISIBLE);
         }
-        swipeRefreshLayout.post(new Runnable() {
+        Intent intent = new Intent(MainActivity.this, LocationService.class);
+        startService(intent);
+       /* swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(true);
                 //定位权限判断申请
                 if (Permission.JudgePermission(MainActivity.this)) {
-                    dbCity db = DataSupport.findFirst(dbCity.class);
-                    if (!TextUtils.isEmpty(db.getCity())) {
-                        City = db.getCity();
+                    if (!TextUtils.isEmpty(City)) {
                         weatherHttp.weatherHttp(City);
                         tv_title.setText(City);
                     } else {
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     }
                 }
             }
-        });
+        });*/
 
     }
 
@@ -218,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             list.addAll(AppJsonFileReader.getCityId(province, "", MainActivity.this));
         } else if (city.equals("")) {
             city = str;
+            City = city;
             text.setText(city);
             image_back.setVisibility(View.VISIBLE);
             list.clear();
@@ -229,28 +229,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             tv_title.setText(str);
             drawerLayout.closeDrawer(GravityCompat.START);
             City = str;
-            dbCity db = new dbCity();
-            db.setCity(City);
-            db.save();
+//            dbCity db = new dbCity();
+//            db.setCity(City);
+//            db.save();
         }
         adapter.notifyDataSetChanged();
     }
 
 
     @Override
-    public void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean, String upTime) {
+    public void weathData(List<HeWeather6Model.Daily_forecastModel> dailyList, String upTime) {
         swipeRefreshLayout.setRefreshing(false);
         PredictionAdapter predictionAdapter = new PredictionAdapter(this, dailyList);
         list1.setAdapter(predictionAdapter);
 
-        tv_weather.setText(nowBean.cond.txt);
-        tv_temper.setText(hourlyBean.tmp + "℃");
-        tv_date.setText(upTime.substring(upTime.length() - 5, upTime.length()));
+//        tv_weather.setText(nowBean.cond.txt);
+//        tv_temper.setText(hourlyBean.tmp + "℃");
+        tv_date.setText(upTime);
 
-        tv_pm25.setText(aqiBean.city.pm25);
-        tv_aqi.setText(aqiBean.city.aqi);
+//        tv_pm25.setText(aqiBean.city.pm25);
+//        tv_aqi.setText(aqiBean.city.aqi);
 
-        List<String> strList = new ArrayList<>();
+      /*  List<String> strList = new ArrayList<>();
         strList.add(suggeBean.air.txt);
         strList.add(suggeBean.comf.txt);
         strList.add(suggeBean.cw.txt);
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         strList.add(suggeBean.trav.txt);
         strList.add(suggeBean.uv.txt);
         LifeAdviceAdapter lifeAdapter = new LifeAdviceAdapter(this, strList);
-        list2.setAdapter(lifeAdapter);
+        list2.setAdapter(lifeAdapter);*/
     }
 
 
@@ -278,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 return;
             }
             if (intent.getStringExtra("city").contains("市")) {
-                intent.getStringExtra("city").replace("市", "");
                 city = intent.getStringExtra("city").replace("市", "");//接收参数
             } else {
                 city = intent.getStringExtra("city");
@@ -287,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             if (action.equals("LocationCity")) {
                 weatherHttp.weatherHttp(city);
                 tv_title.setText(city);
+                City = city;
             }
         }
     }

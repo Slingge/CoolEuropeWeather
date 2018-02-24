@@ -2,29 +2,24 @@ package slingge.cooleuropeweather.httpRequest;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
-import slingge.cooleuropeweather.bean.WeatherDataBean.AQIBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.BaseicBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.Hourly_forecastBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.NowBean;
-import slingge.cooleuropeweather.bean.WeatherDataBean.SuggestionBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.HeWeather6Model;
+
 import slingge.cooleuropeweather.db.dbResponse;
 import slingge.cooleuropeweather.util.ToastUtil;
-import slingge.cooleuropeweather.util.abLog;
 
 /**
  * 获取天气信息
@@ -41,7 +36,7 @@ public class WeatherHttp {
 
 
     public interface WeatherDataBackCall {
-        void weathData(AQIBean aqiBean, List<Daily_forecastBean> dailyList, SuggestionBean suggeBean, NowBean nowBean, Hourly_forecastBean hourlyBean, String upTime);
+        void weathData(List<HeWeather6Model.Daily_forecastModel> dailyList, String upTime);
     }
 
     public WeatherDataBackCall weatherData;
@@ -52,7 +47,9 @@ public class WeatherHttp {
 
 
     public void weatherHttp(String city) {
-        OkHttpUtils.get().url("https://api.heweather.com/x3/weather?").addParams("city", city).addParams("key", "a26e3b8650914bc6a429a6e035253cf5").
+        Log.e("获取天气信息.........", city);
+        OkHttpUtils.get().url("https://free-api.heweather.com/s6/weather/forecast?parameters")
+                .addParams("location", city).addParams("key", "a26e3b8650914bc6a429a6e035253cf5").
                 build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -67,9 +64,10 @@ public class WeatherHttp {
             @Override
             public void onResponse(String response, int id) {
                 analysisJson(response);
-                dbResponse db = new dbResponse();//保存
-                db.setResponse(response);
-                db.save();
+                Log.e("天气信息.........", response);
+//                dbResponse db = new dbResponse();//保存
+//                db.setResponse(response);
+//                db.save();
             }
         });
 
@@ -79,37 +77,21 @@ public class WeatherHttp {
      * 解析
      */
     public void analysisJson(String response) {
+
         try {
             JSONObject obj = new JSONObject(response);
-            String res = obj.getString("HeWeather data service 3.0");
-            JSONArray array = new JSONArray(res);
-            for (int i = 0; i < array.length(); i++) {
-                obj = array.getJSONObject(i);
-                if (obj.getString("status").equals("ok")) {
-                    Gson gson = new Gson();
-                    AQIBean aqiBean = gson.fromJson(obj.getString("aqi"), AQIBean.class);
-                    array = new JSONArray(obj.getString("daily_forecast"));
-                    NowBean nowBean = gson.fromJson(obj.getString("now"), NowBean.class);
-                    List<Daily_forecastBean> dailyList = new ArrayList<>();
-                    for (i = 0; i < array.length(); i++) {
-                        Daily_forecastBean dailyBean = gson.fromJson(array.getJSONObject(i).toString(), Daily_forecastBean.class);
-                        dailyList.add(dailyBean);
-                    }
-                    JSONArray array1 = new JSONArray(obj.getString("hourly_forecast"));
-                    Hourly_forecastBean hourlyBean = null;
-                    for (i = 0; i < array1.length(); i++) {
-                        hourlyBean = gson.fromJson(array1.getJSONObject(i).toString(), Hourly_forecastBean.class);
-                    }
-                    BaseicBean baseicBean = gson.fromJson(obj.getString("basic"), BaseicBean.class);
-                    SuggestionBean suggeBean = gson.fromJson(obj.getString("suggestion"), SuggestionBean.class);
-                    weatherData.weathData(aqiBean, dailyList, suggeBean, nowBean, hourlyBean, baseicBean.update.loc);
-                }
-                abLog.e("天气信息", obj.toString());
+            Gson gson = new Gson();
+            List<HeWeather6Model> list = gson.fromJson(obj.getString("HeWeather6"), new TypeToken<List<HeWeather6Model>>() {
+            }.getType());
+            HeWeather6Model model = list.get(0);
+            if (model.status.equals("ok")) {
+                weatherData.weathData(model.daily_forecast, model.update.loc);
+            } else {
+                ToastUtil.showToast("天气信息获取错误");
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
 
 }

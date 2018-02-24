@@ -46,13 +46,10 @@ public class LocationService extends Service {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            String city = location.getCity();
+            String city = location.getCity() ;
             Intent intent = new Intent("LocationCity");
             intent.putExtra("city", city);//要传递的参数
             sendBroadcast(intent);
-            dbCity db = new dbCity();
-            db.setCity(city);
-            db.save();
             mLocationClient.stop();
             mLocationClient = null;
         }

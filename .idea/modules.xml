@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CoolEuropeWeather.iml" filepath="$PROJECT_DIR$/CoolEuropeWeather.iml" />
+      <module fileurl="file://E:\temSpapce\CoolEuropeWeather\CoolEuropeWeather.iml" filepath="E:\temSpapce\CoolEuropeWeather\CoolEuropeWeather.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://E:\temSpapce\CoolEuropeWeather\app\app.iml" filepath="E:\temSpapce\CoolEuropeWeather\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/okhttputils/okhttputils.iml" filepath="$PROJECT_DIR$/okhttputils/okhttputils.iml" />
+      <module fileurl="file://E:\temSpapce\CoolEuropeWeather\okhttputils\okhttputils.iml" filepath="E:\temSpapce\CoolEuropeWeather\okhttputils\okhttputils.iml" />
     </modules>
   </component>
 </project>

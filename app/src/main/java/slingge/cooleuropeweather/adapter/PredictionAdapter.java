@@ -7,12 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.zhy.http.okhttp.builder.PostFileBuilder;
-
 import java.util.List;
 
 import slingge.cooleuropeweather.R;
-import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
+import slingge.cooleuropeweather.bean.WeatherDataBean.HeWeather6Model;
 
 /**
  * 未来天气
@@ -22,9 +20,9 @@ import slingge.cooleuropeweather.bean.WeatherDataBean.Daily_forecastBean;
 public class PredictionAdapter extends BaseAdapter {
 
     private Context context;
-    private List<Daily_forecastBean> list;
+    private List<HeWeather6Model.Daily_forecastModel> list;
 
-    public PredictionAdapter(Context context, List<Daily_forecastBean> list) {
+    public PredictionAdapter(Context context, List<HeWeather6Model.Daily_forecastModel> list) {
         this.context = context;
         this.list = list;
     }
@@ -59,11 +57,11 @@ public class PredictionAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
-        Daily_forecastBean bean = list.get(i);
+        HeWeather6Model.Daily_forecastModel bean = list.get(i);
         holder.tv_date.setText(bean.date.replace("-", "."));
-        holder.tv_weather.setText(bean.cond.txt_d);
-        holder.tv_min.setText(bean.tmp.min + "℃");
-        holder.tv_max.setText(bean.tmp.max + "℃");
+        holder.tv_weather.setText(bean.cond_txt_d);
+        holder.tv_min.setText(bean.tmp_max + "℃");
+        holder.tv_max.setText(bean.tmp_min + "℃");
         return view;
     }
 

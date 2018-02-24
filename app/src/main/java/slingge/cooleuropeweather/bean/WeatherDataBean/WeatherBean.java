@@ -15,7 +15,7 @@ public class WeatherBean {
     public class HeWeatherData{
         public String status;
         public AQIBean aqi;
-        public Daily_forecastBean daily_forecast;
+        public HeWeather6Model daily_forecast;
 
 
 
