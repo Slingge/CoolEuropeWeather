@@ -47,13 +47,20 @@ public class WeatherHttp {
 
 
     public void weatherHttp(String city) {
+        if(TextUtils.isEmpty(city)){
+            ToastUtil.showToast("city is null");
+            return;
+        }
+
         Log.e("获取天气信息.........", city);
         OkHttpUtils.get().url("https://free-api.heweather.com/s6/weather/forecast?parameters")
                 .addParams("location", city).addParams("key", "a26e3b8650914bc6a429a6e035253cf5").
                 build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
+                   okhttp3.OkHttpClient OkHttpClient= OkHttpUtils.getInstance().getOkHttpClient();
                 dbResponse db = DataSupport.findFirst(dbResponse.class);
+
                 if (!TextUtils.isEmpty(db.getResponse())) {
                     analysisJson(db.getResponse());
                     return;
@@ -85,11 +92,14 @@ public class WeatherHttp {
             }.getType());
             HeWeather6Model model = list.get(0);
             if (model.status.equals("ok")) {
+                slingge.cooleuropeweather.util.abLog.d("1");
                 weatherData.weathData(model.daily_forecast, model.update.loc);
             } else {
+                 slingge.cooleuropeweather.util.abLog.d("2");
                 ToastUtil.showToast("天气信息获取错误");
             }
         } catch (JSONException e) {
+             slingge.cooleuropeweather.util.abLog.d("3");
             e.printStackTrace();
         }
     }

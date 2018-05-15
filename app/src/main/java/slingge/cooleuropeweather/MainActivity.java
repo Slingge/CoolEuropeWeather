@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter adapter;
     private List<String> list = new ArrayList<>();
 
+
     private WeatherHttp weatherHttp;
 
     private DrawerLayout drawerLayout;
@@ -269,12 +270,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         public void onReceive(Context context, Intent intent) {
             String city = "";
             if (TextUtils.isEmpty(intent.getStringExtra("city"))) {
+                 swipeRefreshLayout.setRefreshing(false);
                 dbResponse db = DataSupport.findFirst(dbResponse.class);
+                if(db==null){
+                    ToastUtil.showToast("定位失败，且获取历史记录失败，请手动选择所在城市");
+                    return ;
+                }
                 if (!TextUtils.isEmpty(db.getResponse())) {
                     weatherHttp.analysisJson(db.getResponse());
                 }
                 ToastUtil.showToast("定位失败，请手动选择所在城市");
-                swipeRefreshLayout.setRefreshing(false);
+
                 return;
             }
             if (intent.getStringExtra("city").contains("市")) {

@@ -18,4 +18,9 @@ public class abLog {
         }
     }
 
+
+    public static void d(String text){
+        Log.d("ftd",text);
+    }
+
 }
